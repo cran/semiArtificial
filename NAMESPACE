@@ -1,0 +1,23 @@
+export(
+rbfDataGen,
+newdata,
+dataSimilarity,
+ariCompare,
+performanceCompare
+)
+
+import(RSNNS)
+importFrom(mclust,adjustedRandIndex)
+importFrom(cluster, pam, daisy)
+importFrom(fpc, pamk)
+importFrom(CORElearn, CoreModel, modelEval)
+importFrom(MASS, mvrnorm)
+importFrom(nnet, which.is.max)
+importFrom(stats, ks.test)
+importFrom(timeSeries, colStats)
+importFrom(timeDate, skewness)
+importFrom(timeDate, kurtosis)
+
+
+S3method(newdata, RBFgenerator)
+

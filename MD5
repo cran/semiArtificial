@@ -1,0 +1,13 @@
+8a1fe1bd5aec2afe4a1e9922083aebcd *ChangeLog
+b0a362fb2dd18828f8add61ee855ed2f *DESCRIPTION
+bf4bc86803cecf187206ca4a1f570c11 *NAMESPACE
+1b9a77118611d6d67ce37eebac3bb312 *R/dataQuality.R
+cc465730db1714b20f44229cfaa26932 *R/init.R
+576cce3d4d31a668e6cb911579f46e2b *R/misc.R
+0f9ac19770bdb8886a9a3c01cd4217fa *R/semiArt.R
+955215bbb42665c67c4167ba594be78e *man/ariCompare.Rd
+46fa5c5e70acc5924eb99ef7a3fe5a19 *man/dataSimilarity.Rd
+eadd38ededf14fa8a81b5012f2e61d93 *man/newdata.RBFgenerator.Rd
+4f701032eaa60fa7618b95060cb27829 *man/performanceCompare.Rd
+ac2bd9c9f0b61761add32dfbc0e82301 *man/rbfDataGen.Rd
+f94cecc9902d2d022927fa61a6d17ee0 *man/semiArtificial-package.Rd
