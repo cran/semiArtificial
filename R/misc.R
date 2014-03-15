@@ -68,7 +68,6 @@ gatherFromList<-function(lst){
 dataframeFromList<-function(lst){
   df <- data.frame(x = rep(NA, length(lst)))
   
-  
   for (j in 1:length(names(lst[[1]]))) {
     col <- c() 
     for (i in 1:length(lst)){
@@ -76,7 +75,7 @@ dataframeFromList<-function(lst){
     }
     df[[j]] <- col
   }  
-  names(df) <- names(lst[[1]])
+  #names(df) <- names(lst[[1]])
   df
 }
 
@@ -370,7 +369,7 @@ normalize01 <- function(data) {
 # computes Hellinger distance between two discrete distributions given in the form of probability tables
 hellinger <- function(dist1, dist2) {
   dist1 <- sqrt(dist1)
-  dist2 <- sqrt(dist1)
+  dist2 <- sqrt(dist2)
   dd <- (dist1-dist2)^2
   h <- sqrt(sum(dd))/sqrt(2)
   return(h)

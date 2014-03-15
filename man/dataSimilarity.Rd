@@ -8,13 +8,15 @@
    similarity of two data sets.
     }
 \usage{
-dataSimilarity(data1, data2)
+dataSimilarity(data1, data2, dropDiscrete=NA)
 }
 
 \arguments{
   \item{data1}{ A \code{data.frame} containing the reference data.}
   \item{data2}{ A \code{data.frame} with the same number and names of columns as \code{data1}.}
-}
+  \item{dropDiscrete}{ A vector discrete attribute indices to skip in comparison. Typically we might skip class, 
+        because its distribution was forced by the user.}
+  }
 \details{
    The function compares data stored in \code{data1} with \code{data2} on per attribute basis by
     computing several statistics:

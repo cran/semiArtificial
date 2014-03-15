@@ -7,13 +7,17 @@
    Using a generator build with \code{\link{rbfDataGen}} the method generates \code{size} new instances.
     }
 \usage{
-\method{newdata}{RBFgenerator}(object, size, var=c("estimated","Silverman"), ... )
+\method{newdata}{RBFgenerator}(object, size, var=c("estimated","Silverman"), 
+                               classProb=NULL, defaultSpread=NULL, ... )
 }
 
 \arguments{
   \item{object}{ An object of type RBFgenerator containing a generator structure as returned by \code{\link{rbfDataGen}}. }
   \item{size}{ A number of instances to generate.}
   \item{var}{The method of kernel width (variance) estimation. Supported options are \code{"estimated"} and \code{"Silverman"}.}
+  \item{classProb}{A vector of desired class value probability distribution. Default value \code{classProb=NULL} uses probability distribution of the generator training instances.  }
+  \item{defaultSpread}{A numeric value replacing zero spread in case \code{var="estimated"} is used. Default value \code{defaultSpread=NULL} keeps zero spread values.  }
+  
   \item{... }{ Additional parameters passed to future extended versions of the function. } 
 }
 \details{

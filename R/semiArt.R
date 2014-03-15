@@ -1,5 +1,5 @@
 
-rbfDataGen <- function(formula, data, eps=1e-4, minSupport=5, nominal=c("asInteger","encodeBinary")) {
+rbfDataGen <- function(formula, data, eps=1e-4, minSupport=1, nominal=c("encodeBinary", "asInteger")) {
   
   if (!inherits(formula,"formula")) 
     stop("First argument must be a formula.");
@@ -36,7 +36,9 @@ rbfDataGen <- function(formula, data, eps=1e-4, minSupport=5, nominal=c("asInteg
     }
   }
   noCol[1] <- 1 # class remains unchanged, even if it is a factor with several values
-
+  noClasses <- length(attrLevels[[1]])
+  classProb <- table(dat[[1]])/nrow(dat)
+     
   if (nominal=="encodeBinary") {   
     isDiscrete <- vector(mode="logical", length= sum(noCol))
     datBin <- as.data.frame(matrix(0,nrow=nrow(dat),ncol=sum(noCol)))
@@ -114,28 +116,53 @@ rbfDataGen <- function(formula, data, eps=1e-4, minSupport=5, nominal=c("asInteg
     }
   }
   gen <- list(noGaussians=noG, centers=centers, probs=probs, unitClass=unitClass, bias=bias,
-              spread=spread, gNoActivated=gNoActivated,
+              spread=spread, gNoActivated=gNoActivated, noClasses=noClasses, classProb = classProb,
               noAttr=noAttr, datNames=datNames,  originalNames=originalNames, 
               attrClasses=attrClasses, attrLevels=attrLevels, attrOrdered=attrOrdered,
               normParameters=getNormParameters(dataLearn$inputsTrain),
-              noCol=noCol,isDiscrete=isDiscrete,noAttrGen=noAttrGen,nominal=nominal)
+              noCol=noCol,isDiscrete=isDiscrete, noAttrGen=noAttrGen, nominal=nominal,
+              eps=eps)
   class(gen) <- "RBFgenerator"
   gen
 }
 
 newdata <- function(object, ...) UseMethod("newdata", object)
 
-newdata.RBFgenerator <- function(object, size, var=c("estimated","Silverman"), ...) {
+newdata.RBFgenerator <- function(object, size, var=c("estimated","Silverman"), classProb=NULL, defaultSpread=NULL, ...) {
   if (! is(object, "RBFgenerator"))
     stop("newdata requires object of type RBFgenerator")
   
   var <- match.arg(var)
-    n <- size
-  nh <- intFromProb(object$probs, n)
+  n <- size
+  
+  if (is.null(classProb)) { # use class probability from the generator
+    classProb <- object$classProb
+  }
+  
+  # compute number of cases to generate from each Gaussian
+  if (length(classProb) != object$noClasses)
+      warning("Class probability distribution does not match the number of classes in the generator which is ", object$noClasses)
+  if (abs(sum(classProb)-1) > object$eps)
+        warning("Class probability distribution does not sum to 1 for classProb ")
+  unitProbs <- vector(mode="numeric", length = object$noGaussians)
+  for (cl in 1:object$noClasses) {
+       sumProb <- sum(object$probs[object$unitClass == cl])
+       if (sumProb > object$eps)
+          unitProbs[object$unitClass == cl] <- classProb[cl] * object$probs[object$unitClass == cl] / sumProb             
+  }
+  # some classes might not be represented with the kernels, so we renormalize the distribution
+  unitProbs <- unitProbs / sum(unitProbs)
+  
+  nh <- intFromProb(unitProbs, n) # number of instances from each Gaussian unit
+  
   genValues <- matrix(0,nrow=0,ncol=object$noAttrGen)
   genClass <- c()
   sigma <- diag(nrow=object$noAttrGen)
+  
   spread <- object$spread
+  if (!is.null(defaultSpread))
+      spread[spread <= object$eps] <- defaultSpread
+  
   for (i in 1:object$noGaussians) {
     if (nh[i] > 0) {
       # prepare  diagonal matrix Sigma
@@ -144,10 +171,8 @@ newdata.RBFgenerator <- function(object, size, var=c("estimated","Silverman"), .
         for (a in 1: object$noAttrGen)
           spread[i, a] = (4/(object$noAttrGen+2))^(1/(object$noAttrGen+4)) * object$gNoActivated[i]^(-1/(object$noAttrGen+4)) * sqrt(spread[i,a])
       }
-      #if (var=="learned")  unuseful as bias contains other factors besides sigma
-      #  diag(sigma) <- rep(1/sqrt(object$bias[i]), object$noAttrGen) # bias of a unit is used as a sigma
-      else # for "estimated" spread of training instances serves as variance, for "Silverman" his rule multivariate rule of a thumb is used
-        diag(sigma) <- spread[i,]  
+      # for "estimated" spread of training instances serves as variance, for "Silverman" his rule multivariate rule of a thumb is used
+      diag(sigma) <- spread[i,]
       multiplier <- 2
       ggenerated <- 0
       while ( ggenerated < nh[i] ) {
@@ -174,7 +199,7 @@ newdata.RBFgenerator <- function(object, size, var=c("estimated","Silverman"), .
         genClass <- c(genClass,rep(object$unitClass[i],nrow(gvi)))
         multiplier <- 2 * multiplier
         if (multiplier > 128) {
-          warning("newdata cannot generate sufficient data from gaussian number ", i)
+          warning("newdata cannot generate sufficient data from Gaussian number ", i)
         }
       }
     }

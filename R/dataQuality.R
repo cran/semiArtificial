@@ -1,7 +1,7 @@
 # functions comparing the data sets and measuring quality of generated data
 
 
-dataSimilarity <- function(data1, data2) {
+dataSimilarity <- function(data1, data2, dropDiscrete=NA) {
   
   if(ncol(data1)!=ncol(data2))
     stop("Only data with equal number of columns can be compared.")
@@ -70,12 +70,16 @@ dataSimilarity <- function(data1, data2) {
   colnames(s1) <- colnames(s2) <- colnames(s1Norm) <- colnames(s2Norm) <- colnames(ds) <- names(data1Num)
   rownames(s1) <- rownames(s2) <- rownames(s1Norm)<- rownames(s2Norm) <- rownames(ds) <- c("mean","stdev","skewness","kurtosis")
   
-  # nominal attributes: compare frequencies
+  # nominal attributes: compare frequencies and Hellinger distance
   f1 <- list()
   f2 <- list()
   df <- list()
   hel <- c() # store Hellinger distance between two discrete distributions
   discreteIdx<-which(discrete)
+  if (! is.na(dropDiscrete)) {
+    dropIdx <- match(dropDiscrete, names(data1))
+    discreteIdx <- discreteIdx[-match(dropIdx, discreteIdx, nomatch=length(discreteIdx)+1)]
+  }
   for (i in seq(along=discreteIdx)) {
     f1[[i]] <- table(data1[,discreteIdx[i]])/nrow(data1)
     names(f1)[i] <-names(data1)[discreteIdx[i]]
@@ -88,8 +92,8 @@ dataSimilarity <- function(data1, data2) {
   if (length(hel) > 0) 
       names(hel)<- names(data1)[discreteIdx]
   
-  list(equalInstances=equalInst(data1,data2), stats1num=s1, stats2num=s2, ksP=ks, 
-       freq1=f1, freq2=f2, dfreq=df, dstatsNorm=ds, hellingerDist=hel)
+  list(equalInstances=equalInstDaisy(data1,data2), stats1num=s1, stats2num=s2, stats1numNorm=s1Norm, stats2numNorm=s2Norm,
+       KSpvalue=ks, freq1=f1, freq2=f2, dfreq=df, dstatsNorm=ds, hellingerDist=hel)
 }
 
 # equalInst<-function(data1, data2) {
@@ -109,6 +113,16 @@ equalInst<-function(data1, data2) {
   eq
 }
 
+equalInstDaisy <- function(data1, data2, tolerance=1e-5) {
+  dta <- rbind(data1, data2)
+  sim <- as.matrix(daisy(dta, metric="gower"))
+  eq <- 0
+  for (i in (nrow(data1)+1):nrow(sim)) {
+    if (length(which(sim[i,]< tolerance)) >1)
+      eq <- eq+1
+  }
+  eq
+}
 
 meanMinDistance<-function(data1, data2) {
   dist <- vector(mode="numeric",length=nrow(data2))

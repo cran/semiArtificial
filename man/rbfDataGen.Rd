@@ -5,7 +5,7 @@
   Using given \code{formula} and \code{data} the method builds a RBF network and extracts its properties thereby preparing a data generator which can be used with \code{\link{newdata.RBFgenerator}} method to generate sem-artificial data.
 }
 \usage{
- rbfDataGen(formula, data, eps=1e-4, minSupport=5, nominal=c("asInteger","encodeBinary")) 
+ rbfDataGen(formula, data, eps=1e-4, minSupport=1, nominal=c("encodeBinary","asInteger")) 
 }
 \arguments{
   \item{formula}{ A formula specifying the response and variables to be modeled. }
