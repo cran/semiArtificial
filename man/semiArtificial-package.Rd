@@ -1,5 +1,6 @@
 \name{semiArtificial-package}
 \alias{semiArtificial-package}
+\alias{semiArtificial}
 
 \docType{package}
 \title{Generation and evaluation of semi-artificial data}
@@ -12,16 +13,16 @@ algorithms and generates new data with the same properties.
  The package currently includes the following data generators:
  \itemize{
 \item a RBF network based generator using rbfDDA model from RSNNS package.
-%\item generator using density tree forest for unsupervised data,
-%\item generator using random forest for classification.
+\item generator using density tree forest for unsupervised data,
+\item generator using random forest for classification and regression.
 }
 Data evaluation support tools include:
 \itemize{
-\item statistical evaluation: mean, median,standard deviation, skewness, kurtosis, 
-\item evaluation based on clustering using Adjusted Rand Index (ARI),
-\item evaluation based on classification with random forests.
+\item statistical evaluation: mean, median,standard deviation, skewness, kurtosis, medcouple, L/RMC,
+\item evaluation based on clustering using Adjusted Rand Index (ARI) and Fowlkes-Mallows index (FM),
+\item evaluation based on prediction with a model, e.g., random forests.
 }
-Further software may be available from \url{http://lkm.fri.uni-lj.si/rmarko/software}. 
+Further software and development versions are available at \url{http://lkm.fri.uni-lj.si/rmarko/software}. 
 }
 \author{
 Marko Robnik-Sikonja 
@@ -39,7 +40,8 @@ Other references are available from \url{http://lkm.fri.uni-lj.si/rmarko/papers/
 
 \seealso{
 \code{\link{rbfDataGen}},
-\code{\link{newdata.RBFgenerator}},
+\code{\link{treeEnsemble}},
+\code{\link{newdata}},
 \code{\link{dataSimilarity}},
 \code{\link{ariCompare}},
 \code{\link{performanceCompare}}.

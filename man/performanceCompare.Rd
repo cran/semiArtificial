@@ -2,13 +2,13 @@
 \alias{performanceCompare}
 
 
-\title{ Evaluate similarity of two data sets based on classification performance}
+\title{ Evaluate similarity of two data sets based on predictive performance}
 \description{
-   Classification performance (accuracy, AUC,...) of two data sets is used to compare similarity of two data sets.
+   Depending on the type of problem (classification or regression), a classification performance (accuracy, AUC, brierScore, etc) 
+   or regression performance (RMSE, MSE, MAE, RMAE, etc) on two data sets is used to compare the similarity of two data sets.
     }
 \usage{
-performanceCompare(data1, data2, formula, model="rf", stat="accuracy", ...) 
-
+performanceCompare(data1, data2, formula, model="rf", stat=NULL, ...) 
 }
 
 \arguments{
@@ -16,10 +16,11 @@ performanceCompare(data1, data2, formula, model="rf", stat="accuracy", ...)
   \item{data2}{ A \code{data.frame} with the same number and names of columns as \code{data1}.}
   \item{formula}{ A \code{formula} specifying the response and predictive variables.}
   \item{model}{ A predictive model used for performance comparison. The default value "rf" stands for random forest, 
-  but any classification model supported by function \code{CoreModel} in 
+  but any classification or regression model supported by function \code{CoreModel} in 
   \href{http://CRAN.R-project.org/package=CORElearn}{CORElearn} package can be used. }
-  \item{stat}{ A statistics used as performance indicator. The default value is "accuracy" but other values supported by
-  \code{modelEval} from \href{http://CRAN.R-project.org/package=CORElearn}{CORElearn} package can be used eg. "AUC" or "brierScore".}
+  \item{stat}{ A statistics used as performance indicator. The default value is NULL and means that for classification "accuracy" is used,
+   and for regression "RMSE"" (relative mean squared error) is used. Other values supported and output by  \code{modelEval} 
+   from \href{http://CRAN.R-project.org/package=CORElearn}{CORElearn} package can be used e.g., "AUC" or "brierScore".}
   \item{... }{ Additional parameters passed to \code{CoreModel} function. } 
 }
 \details{

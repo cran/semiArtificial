@@ -1,3 +1,5 @@
+semiArtificial-2.0.1, 2015-09-03: adaptation to CRAN requirements
+semiArtificial-2.0.0, 2015-09-02: new generators based on density forests and random forsts
 semiArtificial-1.2.0, 2014-03-15: bug fixes, interface changes, documentation improvements
 semiArtificial-1.1.0, 2014-02-24: added data evaluation functions
 semiArtificial-1.0.0, 2014-01-08: initial testing release of RBF generator

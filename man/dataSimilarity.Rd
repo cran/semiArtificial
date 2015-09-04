@@ -31,7 +31,8 @@ dataSimilarity(data1, data2, dropDiscrete=NA)
 \item{freq1}{A list with value frequencies for discrete attributes in \code{data1}.}
 \item{freq2}{A list with value frequencies for discrete attributes in \code{data2}.}
 \item{dfreq}{A list with differences in frequencies of discrete attributes' values between  \code{data1} and \code{data2}.}
-\item{dstatsNorm}{A matrix with rows containing difference between statistics (mean, standard deviation, skewness, and kurtosis) computed on [0,1] normalized numeric attributes for \code{data1} and \code{data2.}}
+\item{dstatsNorm}{A matrix with rows containing difference between statistics (mean, standard deviation, skewness, and kurtosis) 
+                  computed on [0,1] normalized numeric attributes for \code{data1} and \code{data2.}}
 \item{hellingerDist}{A vector with Hellinger distances between matching attributes from \code{data1} and \code{data2}.} 
   }
 

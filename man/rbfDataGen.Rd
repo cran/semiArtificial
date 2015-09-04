@@ -2,7 +2,8 @@
 \alias{rbfDataGen}
 \title{A data generator based on RBF network}
 \description{
-  Using given \code{formula} and \code{data} the method builds a RBF network and extracts its properties thereby preparing a data generator which can be used with \code{\link{newdata.RBFgenerator}} method to generate sem-artificial data.
+  Using given \code{formula} and \code{data} the method builds a RBF network and extracts its properties thereby preparing a data generator which can be used 
+  with \code{\link{newdata.RBFgenerator}} method to generate semi-artificial data.
 }
 \usage{
  rbfDataGen(formula, data, eps=1e-4, minSupport=1, nominal=c("encodeBinary","asInteger")) 
@@ -14,7 +15,7 @@
   \item{minSupport}{The minimal number of instances defining a Gaussian kernel to copy the kernel to the data generator.}
   \item{nominal}{The way how to treat nominal features. The option \code{"asInteger"} converts factors 
   into integers and treats them as numeric features. The option \code{"encodeBinary"} converts each nominal 
-  attribute into a set of binary features, which encode the nominal value, eg., for three valued attribute 
+  attribute into a set of binary features, which encode the nominal value, e.g., for three valued attribute 
   three binary attributes are constructed, each encoding a presence of one nominal value with 0 or 1.}
 }
 \details{
@@ -43,7 +44,7 @@ in i-th Gaussian.}
 \item{noAttr}{The number of attributes in training data.}
 \item{datNames}{A vector of attributes' names.}
 \item{originalNames}{A vector of original attribute names.}
-\item{attrClasses}{A vector of attributes' classes (ie, data types like \code{numeric} or \code{factor}).}
+\item{attrClasses}{A vector of attributes' classes (i.e., data types like \code{numeric} or \code{factor}).}
 \item{attrLevels}{A list of levels for discrete attributes (with class \code{factor}).}
 \item{attrOrdered}{A vector of type logical indicating whether the attribute is \code{ordered} (only possible for attributes of type \code{factor}.}
 \item{normParameters}{A list of parameters for normalization of attributes to [0,1].}

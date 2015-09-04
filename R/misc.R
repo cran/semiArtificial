@@ -1,4 +1,4 @@
-maxValue <- 1e30 # constant
+maxValue <- .Machine$double.xmax # constant
 
 # shift vector circularly for d elements, 
 # shift left with negative d, shift right with positive d
@@ -37,13 +37,18 @@ cvGen<-function(n,k) {
 
 # generate stratified k-fold cross validation partition based on classes in classVal
 cvGenStratified<-function(classVal,k) {
-  v <- 1:k
+  classVal<-factor(classVal)
+  levs = factor(levels(classVal), levels=levels(classVal))
+  classFreq <- table(classVal)
+  noClasses <- length(levs)
   n <- length(classVal)
   srt <- order(classVal)
   vec <- array(1:k,dim=n)
   cv <- array(0,dim=n)
   cv[srt]<-vec
-  sample(cv, size=n, replace=FALSE)
+  for (i in 1:noClasses) 
+    cv[classVal==levs[i]] <- sample(cv[classVal==levs[i]], size=classFreq[i], replace=F)
+  cv
 }
 
 # collect instances with the same position in different sublists of lst
@@ -67,7 +72,7 @@ gatherFromList<-function(lst){
 # collect instances with the same position in different components of lst
 dataframeFromList<-function(lst){
   df <- data.frame(x = rep(NA, length(lst)))
-  
+    
   for (j in 1:length(names(lst[[1]]))) {
     col <- c() 
     for (i in 1:length(lst)){
@@ -266,7 +271,7 @@ plotRFNorm<-function(point, cluster, somnames, lOffset,myHoriz=FALSE, myAxes=FAL
   legend(xlim[1], ylim[2], somnames, cex=0.8, col=myColor, pch=myPch, horiz=myHoriz);
 }
 
-eps <- 1e-7 
+eps <- 1e-6 
 
 #computes cdf from collection of probabilities summing to 1
 probs2cdf<-function(probs) {
@@ -276,11 +281,15 @@ probs2cdf<-function(probs) {
     cdf[i] <- cdf[i-1] + cdf[i]
     i <- i+1
   }
-  if (abs(cdf[length(cdf)] - 1.0)  > eps)
+  if (abs(cdf[length(cdf)] - 1.0)  > eps) 
     warning("Sum of probability distribution is not equal to 1")
   cdf[length(cdf)] <- 1.0
+  i <- length(cdf) - 1
+  while (cdf[i] > 1.0) {
+    cdf[i] <- 1.0
+    i <- i -1
+  }
   cdf
-
 }
 
 # finds quantile of a factor given by probability distribution
@@ -336,7 +345,7 @@ medianImpute <- function(data) {
       if (is(data[[i]],"factor"))
         data[which(nas), i] <- factorMode(data[[i]])
       else
-       data[which(nas), i] <- mmedian(data[[i]])
+       data[which(nas), i] <- median(data[[i]],na.rm=T)
     }
   }
   data
@@ -373,4 +382,41 @@ hellinger <- function(dist1, dist2) {
   dd <- (dist1-dist2)^2
   h <- sqrt(sum(dd))/sqrt(2)
   return(h)
+}
+
+# a simple toy data generator, producing separated Gaussians, with two or three class values and one to three attributes
+toyGauss <- function(noInst=100, noAttr=2, noClassValues=3){
+	noData <- noInst
+    if (! noClassValues %in% c(2,3))
+      stop("Argument noClassValues shall be 2 or 3.")
+	if (! noAttr %in% 1:3)
+		stop("Argument noAttr shall be 1, 2, or 3.")
+	
+	mu1 <- rep(-5,noAttr)
+	sigma1 <- diag(nrow=noAttr)
+	attrs1 <- mvrnorm(n=noData,mu=mu1,Sigma=sigma1)
+	data1<-cbind(attrs1,rep(1,noData)) # attach class value 1
+	
+	mu2 <- rep(5,noAttr)
+	sigma2 <- diag(nrow=noAttr)
+	attrs2 <- mvrnorm(n=noData,mu=mu2,Sigma=sigma2)
+	data2<-cbind(attrs2,rep(2,noData)) # attach class value 2
+	
+	mu3 <- rep(0,noAttr)
+	sigma3 <- diag(nrow=noAttr)
+	attrs3 <- mvrnorm(n=noData,mu=mu3,Sigma=sigma3)
+	data3<-cbind(attrs3,rep(3,noData)) # attach class value 3
+	
+	if (noClassValues==3)
+		data <- rbind(data1,data2,data3) # merge 3
+	else if (noClassValues==2)
+		data <- rbind(data1,data2) # merge 2
+	
+	data <-as.data.frame(data)
+	#form attribute names
+	attrNames <- c("class")
+	attrNames <- c(paste("A",1:noAttr,sep=""),attrNames)
+	names(data) <- attrNames
+	data$"class" <- as.factor(data$"class")
+	data
 }

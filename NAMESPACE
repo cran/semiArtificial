@@ -3,21 +3,31 @@ rbfDataGen,
 newdata,
 dataSimilarity,
 ariCompare,
-performanceCompare
+performanceCompare,
+treeEnsemble,
+indAttrGen
 )
 
 import(RSNNS)
 importFrom(mclust,adjustedRandIndex)
 importFrom(cluster, pam, daisy)
 importFrom(fpc, pamk)
-importFrom(CORElearn, CoreModel, modelEval)
+importFrom(CORElearn, CoreModel, modelEval,noEqualRows, destroyModels,attrEval,infoCore)
 importFrom(MASS, mvrnorm)
 importFrom(nnet, which.is.max)
-importFrom(stats, ks.test)
-importFrom(timeSeries, colStats)
+importFrom(stats, ks.test,quantile,ecdf)
 importFrom(timeDate, skewness)
 importFrom(timeDate, kurtosis)
-
-
+importFrom(robustbase,mc)
+importFrom(dendextend,FM_index)
+importFrom(logspline,logspline, rlogspline)
+importFrom(ks, rkde, kde)
+importFrom("graphics", "axis", "legend", "lines", "plot", "points")
+importFrom("methods", "is")
+importFrom("stats", "as.formula", "delete.response", "median","model.frame", "na.pass", "predict", 
+           "runif", "sd", "terms","var")
+importFrom("utils", "Rprof")
+ 
+   
 S3method(newdata, RBFgenerator)
-
+S3method(newdata, TreeEnsemble)
