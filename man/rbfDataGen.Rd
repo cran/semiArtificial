@@ -6,7 +6,8 @@
   with \code{\link{newdata.RBFgenerator}} method to generate semi-artificial data.
 }
 \usage{
- rbfDataGen(formula, data, eps=1e-4, minSupport=1, nominal=c("encodeBinary","asInteger")) 
+ rbfDataGen(formula, data, eps=1e-4, minSupport=1, 
+            nominal=c("encodeBinary","asInteger")) 
 }
 \arguments{
   \item{formula}{ A formula specifying the response and variables to be modeled. }
@@ -24,7 +25,7 @@
   interaction terms are not supported. The simplest way is
   to specify just the response variable using e.g. \code{class ~ .}. See examples below.
 
-  A RBF network is build using \code{rbfDDA} from \href{http://CRAN.R-project.org/package=RSNNS}{RSNNS} package. 
+  A RBF network is build using \code{rbfDDA} from \href{https://CRAN.R-project.org/package=RSNNS}{RSNNS} package. 
   The learned Gaussian kernels are extracted and used in data generation with 
   \code{\link{newdata.RBFgenerator}} method.
  

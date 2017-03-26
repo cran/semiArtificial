@@ -66,21 +66,17 @@ randomTree<-function(dataset, minNodeWeight, noSelectedAttr,
   else 
     node <-  makeRegressionNodeSplit(dataset[,c(selAttr, classIdx)], classStat, minNodeWeight, numSplit)
   
-  
   if (node$nodeType=="leaf") {
     return(node)
   }
   else { 
     node$splitAttr <- selAttr
-    
-    if (densityData == "topDown") {
+	node$pLeft <- length(node$leftInstances) / nrow(dataset)
+	
+    if (densityData == "topDown" || densityData == "bottomUp") {
       node$unique <- uniqueVal
-    }
-    else if (densityData == "bottomUp") {
-      node$unique <- uniqueVal
-      node$pLeft <- length(node$leftInstances) / nrow(dataset)
-    }
-    
+    }    
+	
     # recursive splitting
     node$leftTree <- randomTree(dataset[node$leftInstances,], minNodeWeight, noSelectedAttr, problemType, densityData, estimator)
     node$leftInstances <- NULL
@@ -377,6 +373,37 @@ predictWithTree<-function(node, instance) {
   }
 }
 
+findLeafIdx <- function(node, instance) {
+	if (node$nodeType=="leaf") 
+		return(node$leafIdx)
+	else {
+		if (is.na(instance[node$splitAttr])) { # value not yet assigned
+			if (runif(1,0,1) <= node$pLeft) { 
+				#going left
+				return(findLeafIdx(node$leftTree, instance))
+			}
+			else {
+				return(findLeafIdx(node$rightTree, instance))
+			}
+		}
+		else { # value not missing
+			if (node$splitType == "discrete")  {        
+				value <- factor(instance[node$splitAttr], levels = 1:length(levels(node$leftValues)), labels=levels(node$leftValues))
+				if (value %in% node$leftValues) 
+					return(findLeafIdx(node$leftTree, instance))
+				else if (value %in% node$rightValues)
+					return(findLeafIdx(node$rightTree, instance))
+				else stop("findLeafIdx encountered an unrecognized attribute value in tree node comparison ",value)
+			}
+			else { # numeric attribute
+				if (instance[node$splitAttr] <= node$splitValue) 
+					return(findLeafIdx(node$leftTree, instance))
+				else return(findLeafIdx(node$rightTree, instance))       
+			}
+		}
+	}
+}
+
 
 fillDataWithTreeTopDown <- function(node, instance) {
   if (node$nodeType=="leaf") {
@@ -549,13 +576,26 @@ fillWithInstance <- function(node, instance, instIdx){
   }  
   return(node)
 }
-
 genFromLeaves<-function(tree, dat, cdfEstimation, ...) {
+  onPath<-vector(mode="logical", length=ncol(dat))
   leaf <- list()
-  leaf <- collectLeaves(tree, leaf) 
+  leaf <- collectLeaves(tree, leaf, onPath) 
   generator <- list(leaves=list(),weights=c())
+  # prepare structure for class weights
+  if (!is.null(leaf[[1]]$classProb)) {
+     generator$classWeights <- list()
+	 noClasses <- length(leaf[[1]]$classProb)
+	 for (cl in 1:noClasses){
+		 generator$classWeights[[cl]]<- vector(mode="numeric",length=0) 
+	 }
+  }
   for (i in 1:length(leaf)) {
     generator$weights <- c(generator$weights, length(leaf[[i]]$instances))
+	if (!is.null(generator$classWeights)) { # for classification problem construct class weights for each class separately
+		for (cl in 1:noClasses){
+			generator$classWeights[[cl]]<-c(generator$classWeights[[cl]], round(leaf[[i]]$noInst *  leaf[[i]]$classProb[cl])) 
+		}
+	}	
     cdfs <- list()
     for (a in 1:ncol(dat)) {
       vals <- dat[leaf[[i]]$instances, a]
@@ -568,10 +608,17 @@ genFromLeaves<-function(tree, dat, cdfEstimation, ...) {
       else if (cdfEstimation == "kde")
         cdfs[[a]] <- robustKde(vals, ...)
     }
-    generator$leaves[[i]] <- list(cdfs = cdfs)
+    generator$leaves[[i]] <- list(cdfs = cdfs, onPath=leaf[[i]]$onPath)
   }
   generator$weights <- generator$weights / sum(generator$weights)
-  
+  if (!is.null(generator$classWeights)) { # normaliye to probabilities for each class separately
+	  for (cl in 1:noClasses){
+		  sumCl <- sum(generator$classWeights[[cl]])
+		  if (sumCl > 0)
+		    generator$classWeights[[cl]]<- generator$classWeights[[cl]] / sumCl
+		  # else all zeros remain
+	  }
+  }	
   return(generator)
 }
 
@@ -632,19 +679,32 @@ generatorFromTree<-function(node, dat, densityData, cdfEstimation, ...) {
 }
 
 
-collectLeaves <- function(node, leaf) {
+collectLeaves <- function(node, leaf, onPath) {
   if (node$nodeType=="leaf") {
+	node$onPath <- onPath  
     leaf[[length(leaf)+1]] <- node
   }
   else {
-    leaf <- collectLeaves(node$leftTree, leaf)
-    leaf <- collectLeaves(node$rightTree, leaf)
+	onPath[node$splitAttr] <- TRUE
+    leaf <- collectLeaves(node$leftTree, leaf, onPath)
+    leaf <- collectLeaves(node$rightTree, leaf, onPath)
   }
   return(leaf)
-  
 }
 
-
+fillWithLeafIdx <- function(node, leafIdx) {
+	if (node$nodeType=="leaf") {
+		node$leafIdx <- leafIdx  
+		return(list(node=node, idx=leafIdx+1))
+	}
+	else {
+		lTreeList <- fillWithLeafIdx(node$leftTree, leafIdx)
+		node$leftTree <- lTreeList$node
+		rTreeList <- fillWithLeafIdx(node$rightTree, lTreeList$idx)
+		node$rightTree <- rTreeList$node
+		return(list(node=node,idx=rTreeList$idx))
+	}
+}
 
 tree2dot <- function(tree, attrNames, filename=NULL, name="dottree",digits=2) {
   if (!is.null(filename))

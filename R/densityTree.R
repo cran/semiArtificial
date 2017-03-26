@@ -87,13 +87,13 @@ densityTree<-function(dataset, minNodeWeight=2, noSelectedAttr=2, densitySplitMe
   }
   else { 
     node$splitAttr <- selAttr
-  
+	node$pLeft <- length(node$leftInstances) / nrow(dataset)
+	
     if (densityData == "topDown" || densityData == "bottomUp") {
       node$unique <- uniqueVal
-      node$pLeft <- length(node$leftInstances) / nrow(dataset)
     }
     
-     # recursive splitting
+    # recursive splitting
   
     node$leftTree <- densityTree(dataset[node$leftInstances,], minNodeWeight,  noSelectedAttr, densitySplitMethod, densityData)
     node$leftInstances <- NULL

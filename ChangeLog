@@ -1,3 +1,8 @@
+semiArtificial-2.2.4, 2017-03-26: fixes in documentation
+semiArtificial-2.2.3, 2017-03-26: fixes in documentation
+semiArtificial-2.2.2, 2017-03-24: adding parameter predictClass to TreeEnsemble generator
+semiArtificial-2.2.0, 2015-11-25: adding parameter predictClass to TreeEnsemble generator
+semiArtificial-2.1.0, 2015-10-17: adding support for class distribution and onlyPath parameter to TreeEnsemble generator
 semiArtificial-2.0.1, 2015-09-03: adaptation to CRAN requirements
 semiArtificial-2.0.0, 2015-09-02: new generators based on density forests and random forsts
 semiArtificial-1.2.0, 2014-03-15: bug fixes, interface changes, documentation improvements

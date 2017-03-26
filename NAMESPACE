@@ -2,32 +2,31 @@ export(
 rbfDataGen,
 newdata,
 dataSimilarity,
-ariCompare,
+dsClustCompare,
 performanceCompare,
 treeEnsemble,
-indAttrGen
+indAttrGen,
+cleanData
 )
 
 import(RSNNS)
-importFrom(mclust,adjustedRandIndex)
+importFrom("flexclust", "comPart")
 importFrom(cluster, pam, daisy)
 importFrom(fpc, pamk)
 importFrom(CORElearn, CoreModel, modelEval,noEqualRows, destroyModels,attrEval,infoCore)
 importFrom(MASS, mvrnorm)
 importFrom(nnet, which.is.max)
-importFrom(stats, ks.test,quantile,ecdf)
-importFrom(timeDate, skewness)
-importFrom(timeDate, kurtosis)
+importFrom(timeDate, skewness, kurtosis)
 importFrom(robustbase,mc)
-importFrom(dendextend,FM_index)
 importFrom(logspline,logspline, rlogspline)
 importFrom(ks, rkde, kde)
 importFrom("graphics", "axis", "legend", "lines", "plot", "points")
 importFrom("methods", "is")
 importFrom("stats", "as.formula", "delete.response", "median","model.frame", "na.pass", "predict", 
-           "runif", "sd", "terms","var")
+           "runif", "sd", "terms","var","ks.test","quantile","ecdf")
 importFrom("utils", "Rprof")
- 
+importFrom("mcclust","vi.dist")
+importFrom("StatMatch","gower.dist") 
    
 S3method(newdata, RBFgenerator)
 S3method(newdata, TreeEnsemble)

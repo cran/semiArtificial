@@ -9,12 +9,16 @@ rbfDataGen <- function(formula, data, eps=1e-4, minSupport=1, nominal=c("encodeB
   
   #prepare data according to the supplied formula, dependent variable on place 1
   dat <- model.frame(formula, data=data, na.action=na.pass);
+  class.lev <- levels(dat[[1]]);
+  returnedDat <- dat[,c(2:ncol(dat),1)] # class to the end
   
   datNames <- names(dat)
   originalNames <- names(data)[sort(match(datNames, names(data)))]
   noInst <- nrow(dat)
   noAttr = ncol(dat) - 1
-  
+  if (!is.factor(dat[[1]]))
+	  stop("The function rbfDataGn can only be used for classification problems, while response ",names(dat)[1]," is of class ",class(dat[[1]]))
+
   attrClasses<-list()
   attrLevels <-list()
   attrOrdered<-logical()
@@ -38,7 +42,9 @@ rbfDataGen <- function(formula, data, eps=1e-4, minSupport=1, nominal=c("encodeB
   noCol[1] <- 1 # class remains unchanged, even if it is a factor with several values
   noClasses <- length(attrLevels[[1]])
   classProb <- table(dat[[1]])/nrow(dat)
-     
+  classIdx <- 1
+  predictorName <- names(dat)[classIdx]
+  
   if (nominal=="encodeBinary") {   
     isDiscrete <- vector(mode="logical", length= sum(noCol))
     datBin <- as.data.frame(matrix(0,nrow=nrow(dat),ncol=sum(noCol)))
@@ -115,13 +121,14 @@ rbfDataGen <- function(formula, data, eps=1e-4, minSupport=1, nominal=c("encodeB
         spread[g,a] <- eps
     }
   }
-  gen <- list(noGaussians=noG, centers=centers, probs=probs, unitClass=unitClass, bias=bias,
+  gen <- list(formula=formula,class.lev=class.lev, noGaussians=noG, centers=centers, probs=probs, unitClass=unitClass, bias=bias,
               spread=spread, gNoActivated=gNoActivated, noClasses=noClasses, classProb = classProb,
+			  predictorName=predictorName, problemType="classification",
               noAttr=noAttr, datNames=datNames,  originalNames=originalNames, 
               attrClasses=attrClasses, attrLevels=attrLevels, attrOrdered=attrOrdered,
               normParameters=getNormParameters(dataLearn$inputsTrain),
               noCol=noCol,isDiscrete=isDiscrete, noAttrGen=noAttrGen, nominal=nominal,
-              eps=eps)
+              eps=eps, dat=returnedDat)
   class(gen) <- "RBFgenerator"
   gen
 }
@@ -223,11 +230,13 @@ newdata.RBFgenerator <- function(object, size, var=c("estimated","Silverman"), c
   genData<-as.data.frame(matrix(cbind(genClass,genValues),nrow=length(genClass),ncol=ncol(genValues)+1))
  
   for (i in 1:ncol(genData)){
-     if ( "factor" %in% object$attrClasses[[i]])  {
+     if ( "factor" %in% object$attrClasses[[i]] )  {
         genData[[i]] <- factor(genData[[i]],levels=1:length(object$attrLevels[[i]]), labels=object$attrLevels[[i]])
         if (object$attrOrdered[i])
           genData[[i]] <- as.ordered(genData[[i]])
     }
+	else if ( "integer" %in% object$attrClasses[[i]] )
+		genData[[i]] <- as.integer(round(genData[[i]]))
   }
   names(genData) <- object$datNames
   genData <- genData[sample(1:nrow(genData),nrow(genData)),]  # shuffle

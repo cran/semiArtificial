@@ -43,6 +43,6 @@ Other references are available from \url{http://lkm.fri.uni-lj.si/rmarko/papers/
 \code{\link{treeEnsemble}},
 \code{\link{newdata}},
 \code{\link{dataSimilarity}},
-\code{\link{ariCompare}},
+\code{\link{dsClustCompare}},
 \code{\link{performanceCompare}}.
 }

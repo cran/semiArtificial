@@ -17,10 +17,10 @@ performanceCompare(data1, data2, formula, model="rf", stat=NULL, ...)
   \item{formula}{ A \code{formula} specifying the response and predictive variables.}
   \item{model}{ A predictive model used for performance comparison. The default value "rf" stands for random forest, 
   but any classification or regression model supported by function \code{CoreModel} in 
-  \href{http://CRAN.R-project.org/package=CORElearn}{CORElearn} package can be used. }
+  \href{https://CRAN.R-project.org/package=CORElearn}{CORElearn} package can be used. }
   \item{stat}{ A statistics used as performance indicator. The default value is NULL and means that for classification "accuracy" is used,
    and for regression "RMSE"" (relative mean squared error) is used. Other values supported and output by  \code{modelEval} 
-   from \href{http://CRAN.R-project.org/package=CORElearn}{CORElearn} package can be used e.g., "AUC" or "brierScore".}
+   from \href{https://CRAN.R-project.org/package=CORElearn}{CORElearn} package can be used e.g., "AUC" or "brierScore".}
   \item{... }{ Additional parameters passed to \code{CoreModel} function. } 
 }
 \details{

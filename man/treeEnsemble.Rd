@@ -9,7 +9,7 @@
   assuming conditionally independent attributes. 
 }
 \usage{
- treeEnsemble(formula, dataset, noTrees = 100, minNodeWeight=2, noSelectedAttr=2, 
+ treeEnsemble(formula, dataset, noTrees = 100, minNodeWeight=2, noSelectedAttr=0, 
   	problemType=c("byResponse","classification", "regression","density"),
     densityData=c("leaf", "topDown", "bottomUp","no"),
     cdfEstimation = c("ecdf","logspline","kde"), 
@@ -24,7 +24,10 @@ indAttrGen(formula, dataset, cdfEstimation = c("ecdf","logspline","kde"),
   \item{dataset}{ A data frame with training data. }
   \item{noTrees}{ The number of trees in the ensemble.}
   \item{minNodeWeight}{The minimal number of instances in a tree leaf.}
-  \item{noSelectedAttr}{NUmber of randomly selected attributes in each node which are considered as possible splits.}
+  \item{noSelectedAttr}{Number of randomly selected attributes in each node which are considered as possible splits. In general this should be a positive integer, 
+                    but values 0, -1, and -2 are also possible. 
+                     The default value is \code{noSelectedAttr=0}, which causes random selection of integer rounded \eqn{\sqrt{a}}{sqrt(a)} attributes, where $a$ is the number of all attributes. 
+                     Value -1 means that \eqn{1+\log_2{a}}{1+log2(a)} attributes are selected and value -2 means that all attributes are selected.}   
   \item{problemType}{The type of the problem modeled: classification, regression, or unsupervised (density estimation). The default value  \code{"byResponse"} indicates that 
                      the problem type is deducted based on \code{formula} and \code{data}. }
   \item{densityData}{The type of generator data and place where new instances are generated: in the leafs, top down from the root of the tree to the leaves, bottom up from

@@ -10,17 +10,23 @@
 \usage{
 \method{newdata}{RBFgenerator}(object, size, var=c("estimated","Silverman"), 
                                classProb=NULL, defaultSpread=0.05, ... )
-\method{newdata}{TreeEnsemble}(object, size=1, ...) 
+\method{newdata}{TreeEnsemble}(object, size=1, onlyPath=FALSE, classProb=NULL, predictClass=FALSE, ...) 
 
 }
 
 \arguments{
-  \item{object}{ An object of class RBFgenerator or TreeEnsemble containing a generator structure as returned by \code{\link{rbfDataGen}} or \code{\link{treeEnsemble}}, respectively.  }
+  \item{object}{ An object of class \code{RBFgenerator} or \code{TreeEnsemble} containing a generator structure as returned by \code{\link{rbfDataGen}} or \code{\link{treeEnsemble}}, respectively.  }
   \item{size}{ A number of instances to generate.}
-  \item{var}{For RBFgenerator type parameter \code{var} determines the method of kernel width (variance) estimation. Supported options are \code{"estimated"} and \code{"Silverman"}.}
-  \item{classProb}{A vector of desired class value probability distribution. Default value \code{classProb=NULL} uses probability distribution of the generator training instances. }
-  \item{defaultSpread}{For RBFgenerator type parameter is a numeric value replacing zero spread in case \code{var="estimated"} is used. The value \code{defaultSpread=NULL} keeps zero spread values.  }
-  
+  \item{var}{For the generator of type \code{RBFgenerator} the parameter \code{var} determines the method of kernel width (variance) estimation. Supported options are \code{"estimated"} and \code{"Silverman"}.}
+  \item{classProb}{For classification problems, a vector of desired class value probability distribution. Default value \code{classProb=NULL} uses probability distribution of the generator's training instances. }
+  \item{defaultSpread}{For the generator of type \code{RBFgenerator} the parameter is a numeric value replacing zero spread in case \code{var="estimated"} is used. The value \code{defaultSpread=NULL} keeps zero spread values.  }
+  \item{onlyPath}{For the generator of type \code{TreeEnsemble} and attribute density data in the leaves (\code{densityData="leaf"}), 
+               the parameter is a boolean variable indicating if only attributes on the path from the root to the leaf are generated in the leaf.
+               If \code{onlyPath=FALSE} all value are generated in the first randomly chosen leaf of a tree, else only attributes on 
+               the path are generated and then the next random tree is selected. }
+  \item{predictClass}{For classification problems and the generator of type \code{TreeEnsemble} the parameter
+               determines if the class value is set through prediction with the forest or set according to the 
+               class value distribution of the selected leaf. }
   \item{... }{ Additional parameters passed to density estimation functions kde, logspline, and quantile.} 
 }
 \details{
