@@ -1,6 +1,8 @@
 export(
 rbfDataGen,
 newdata,
+newdata.RBFgenerator,
+newdata.TreeEnsemble,
 dataSimilarity,
 dsClustCompare,
 performanceCompare,
@@ -13,7 +15,7 @@ import(RSNNS)
 importFrom("flexclust", "comPart")
 importFrom(cluster, pam, daisy)
 importFrom(fpc, pamk)
-importFrom(CORElearn, CoreModel, modelEval,noEqualRows, destroyModels,attrEval,infoCore)
+importFrom(CORElearn, CoreModel, modelEval,noEqualRows, destroyModels,attrEval,infoCore,predict.CoreModel)
 importFrom(MASS, mvrnorm)
 importFrom(nnet, which.is.max)
 importFrom(timeDate, skewness, kurtosis)
