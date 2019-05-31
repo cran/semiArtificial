@@ -70,6 +70,13 @@ treeEnsemble <-function(formula, dataset, noTrees = 100, minNodeWeight=2, noSele
 			problemType <- "regression"
 		else stop("Prediction variable type shall be either factor for classification or numeric for regression problems.")
 	}
+	if (problemType == "classification" || problemType == "regression") {
+	  missingVals <- is.na(dat[[1]])
+	  if (any(missingVals)) {
+	    cat("Removing ", sum(missingVals)," instances with missing value in dependent variable\n");
+	    dat <- dat[!missingVals,]
+	  }
+	}
 	
 	# set and check estimator
 	if ( is.null(estimator) ) {
@@ -249,7 +256,8 @@ newdata.TreeEnsemble <- function(object, size=1, onlyPath=FALSE, classProb=NULL,
 		}
 		while (sum(nFromClass) > noInst) { # correct possible rounding error
 			rndIdx <- 1 + floor(runif(n=1, min=0, max=length(nFromClass)))
-			nFromClass[rndIdx] <- nFromClass[rndIdx] - 1
+			if (nFromClass[rndIdx] > 0)
+			   nFromClass[rndIdx] <- nFromClass[rndIdx] - 1
 		}
 		
 		classIdx <- object$noAttr # match(object$predictorName, object$originalNames)
@@ -365,7 +373,7 @@ newdata.TreeEnsemble <- function(object, size=1, onlyPath=FALSE, classProb=NULL,
 	names(newdat) <- object$attrNames
 	for (i in 1:object$noAttr){
 		if ("factor" %in% object$attrClasses[[i]]) {
-			newdat[[i]] <- factor(newdat[[i]],levels=1:length(object$attrLevels[[i]]), labels=object$attrLevels[[i]])
+			newdat[[i]] <- factor(newdat[[i]],levels=seq_along(object$attrLevels[[i]]), labels=object$attrLevels[[i]])
 			if (object$attrOrdered[i])
 				newdat[[i]] <- as.ordered(newdat[[i]])
 		}
@@ -700,7 +708,8 @@ cleanData <- function(teObject, newdat, similarDropP=NA, dissimilarDropP=NA, sim
 		
 		if (teObject$problemType != "density") {
 			if (is.null(cleaningObject$postPredictor))  # train a predictor to assign new values
-				cleaningObject$postPredictor <- rf(formula=teObject$formula, dataset=teObject$dat, noTrees=max(100,teObject$noTrees), densityData="no")
+				cleaningObject$postPredictor <- rf(formula=teObject$formula, dataset=teObject$dat, 
+						noTrees=max(100,teObject$noTrees), minNodeWeight=5, noSelectedAttr=0, densityData="no")
 			
 			if (teObject$problemType == "classification") 
 				predictedResponse <- predict(cleaningObject$postPredictor, newdat, type="class")

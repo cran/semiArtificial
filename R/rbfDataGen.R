@@ -18,6 +18,11 @@ rbfDataGen <- function(formula, data, eps=1e-4, minSupport=1, nominal=c("encodeB
   noAttr = ncol(dat) - 1
   if (!is.factor(dat[[1]]))
 	  stop("The function rbfDataGn can only be used for classification problems, while response ",names(dat)[1]," is of class ",class(dat[[1]]))
+  missingVals <- is.na(dat[[1]])
+  if (any(missingVals)) {
+      cat("Removing ", sum(missingVals)," instances with missing value in dependent variable\n");
+      dat <- dat[!missingVals,]
+  }
 
   attrClasses<-list()
   attrLevels <-list()

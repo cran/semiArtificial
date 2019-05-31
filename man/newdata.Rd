@@ -25,7 +25,7 @@
                If \code{onlyPath=FALSE} all value are generated in the first randomly chosen leaf of a tree, else only attributes on 
                the path are generated and then the next random tree is selected. }
   \item{predictClass}{For classification problems and the generator of type \code{TreeEnsemble} the parameter
-               determines if the class value is set through prediction with the forest or set according to the 
+               determines if the class value is set through prediction with the forest (the constructed generator serves as a predictor) or set according to the 
                class value distribution of the selected leaf. }
   \item{... }{ Additional parameters passed to density estimation functions kde, logspline, and quantile.} 
 }
@@ -47,7 +47,7 @@
 \author{ Marko Robnik-Sikonja}
 
 \seealso{
-\code{\link{rbfDataGen}}.
+\code{\link{rbfDataGen}}, \code{\link{treeEnsemble}}.
 }
 \examples{
 # inspect properties of the iris data set

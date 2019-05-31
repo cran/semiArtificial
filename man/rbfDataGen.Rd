@@ -74,7 +74,7 @@ irisTrain <- iris[train,]
 irisTest <- iris[-train,]
 
 # inspect properties of the original data
-plot(irisTrain, col=iris$Species)
+plot(irisTrain, col=irisTrain$Species)
 summary(irisTrain)
 
 # create rbf generator

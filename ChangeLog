@@ -1,3 +1,7 @@
+semiArtificial-2.3.1, 2019-05-31: bux fix for instances with NA in response
+semiArtificial-2.3.0, 2019-05-29: bux fix for empty and NA attributes
+semiArtificial-2.2.6, 2017-05-03: bug fixes, new defaults in classifier for cleanData with reassignResponse
+semiArtificial-2.2.5, 2017-03-31: adaptation to new Depends and Imports statements in CORElearn package
 semiArtificial-2.2.4, 2017-03-26: fixes in documentation
 semiArtificial-2.2.3, 2017-03-26: fixes in documentation
 semiArtificial-2.2.2, 2017-03-24: adding parameter predictClass to TreeEnsemble generator
