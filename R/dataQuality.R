@@ -48,13 +48,15 @@ dataSimilarity <- function(data1, data2, dropDiscrete=NA) {
 			s1[5,notAllNAcol1] <- apply(validData, 2, function(x) mc(jitter(x, factor=1e-7), na.rm=TRUE)) # medcouple MC
 			med1 <- apply(validData, 2, median, na.rm=TRUE)
 			for (i in 1:ncol(validData)) {
-				leftData <- validData[!is.na(validData[,i]) & validData[,i] < med1[i], i]
+				leftData <- validData[!is.na(validData[,i]) & validData[,i] < med1[i], i][[1]]
+				leftData <- leftData[[1]]
 				if (length(leftData) == 0)
 					s1[6,which(notAllNAcol1)[i] ] <- 0
 				else
 					s1[6,which(notAllNAcol1)[i] ] <-  - mc(jitter(leftData, factor=1e-7), na.rm=TRUE) # left MC, LMC
 				
-				rightData <- validData[!is.na(validData[,i]) & validData[,i] > med1[i], i]
+				rightData <- validData[!is.na(validData[,i]) & validData[,i] > med1[i], i][[1]]
+				rightData <- rightData[[1]]
 				if (length(rightData) == 0)
 					s1[7, which(notAllNAcol1)[i] ] <- 0
 				else
@@ -73,13 +75,13 @@ dataSimilarity <- function(data1, data2, dropDiscrete=NA) {
 			s2[5,notAllNAcol2] <- apply(validData, 2, function(x) mc(jitter(x, factor=1e-7), na.rm=TRUE)) # medcouple MC
 			med2 <- apply(validData, 2, median, na.rm=TRUE)
 			for (i in 1:ncol(validData)) {
-				leftData <- validData[!is.na(validData[,i]) & validData[,i] < med2[i], i]
+				leftData <- validData[!is.na(validData[,i]) & validData[,i] < med2[i], i][[1]]
 				if (length(leftData) == 0)
 					s2[6, which(notAllNAcol2)[i] ] <- 0
 				else
 					s2[6, which(notAllNAcol2)[i] ] <-  - mc(jitter(leftData, factor=1e-7), na.rm=TRUE) # left MC, LMC
 				
-				rightData <- validData[!is.na(validData[,i]) & validData[,i] > med2[i], i]
+				rightData <- validData[!is.na(validData[,i]) & validData[,i] > med2[i], i][[1]]
 				if (length(rightData) == 0)
 					s2[7, which(notAllNAcol2)[i] ] <- 0
 				else
@@ -101,17 +103,17 @@ dataSimilarity <- function(data1, data2, dropDiscrete=NA) {
 			s1Norm[5,notAllNAcol1] <- apply(data1NumNorm, 2, function(x) mc(jitter(x, factor=1e-7), na.rm=TRUE)) # medcouple MC
 			med1n <- apply(data1NumNorm, 2, median, na.rm=TRUE)
 			for (i in 1:ncol(data1NumNorm)) {
-				leftData <- data1NumNorm[!is.na(data1NumNorm[,i]) & data1NumNorm[,i] < med1n[i], i]
+				leftData <- data1NumNorm[!is.na(data1NumNorm[,i]) & data1NumNorm[,i] < med1n[i], i][[1]]
 				if (length(leftData) == 0)
 					s1Norm[6, which(notAllNAcol1)[i] ] <- 0
 				else
 					s1Norm[6, which(notAllNAcol1)[i] ] <-  - mc(jitter(leftData, factor=1e-7), na.rm=TRUE) # left MC, LMC
 				
-				rightData <- data1NumNorm[!is.na(data1NumNorm[,i]) & data1NumNorm[,i] > med1n[i], i]
+				rightData <- data1NumNorm[!is.na(data1NumNorm[,i]) & data1NumNorm[,i] > med1n[i], i][[1]]
 				if (length(rightData) == 0)
 					s1Norm[7, which(notAllNAcol1)[i] ] <- 0
 				else
-					s1Norm[7, which(notAllNAcol1)[i] ] <-  mc(jitter(rightData, factor=1e-7), na.rm=TRUE) # right MC, RMC
+					s1Norm[7, which(notAllNAcol1)[i] ] <-  mc(jitter(rightData, factor=1e-7), na.rm=TRUE)# right MC, RMC
 			}
 		}
 		s1Norm[,!notAllNAcol1] <- NA  # set for columns with all value equal to NA
@@ -124,13 +126,13 @@ dataSimilarity <- function(data1, data2, dropDiscrete=NA) {
 			s2Norm[5,notAllNAcol2] <- apply(data2NumNorm, 2, function(x) mc(jitter(x, factor=1e-7), na.rm=TRUE)) # medcuple MC
 			med2n <- apply(data2NumNorm, 2, median, na.rm=TRUE)
 			for (i in 1:ncol(data2NumNorm)) {
-				leftData <- data2NumNorm[!is.na(data2NumNorm[,i]) & data2NumNorm[,i] < med2n[i], i]
+				leftData <- data2NumNorm[!is.na(data2NumNorm[,i]) & data2NumNorm[,i] < med2n[i], i][[1]]
 				if (length(leftData) == 0)
 					s2Norm[6, which(notAllNAcol2)[i] ] <- 0
 				else
 					s2Norm[6, which(notAllNAcol2)[i] ] <-  - mc(jitter(leftData, factor=1e-7), na.rm=TRUE) # left MC, LMC
 				
-				rightData <- data2NumNorm[!is.na(data2NumNorm[,i]) & data2NumNorm[,i] > med2n[i], i]
+				rightData <- data2NumNorm[!is.na(data2NumNorm[,i]) & data2NumNorm[,i] > med2n[i], i][[1]]
 				if (length(rightData) == 0)
 					s2Norm[7, which(notAllNAcol2)[i] ] <- 0
 				else
@@ -144,7 +146,7 @@ dataSimilarity <- function(data1, data2, dropDiscrete=NA) {
 		validCols <- intersect(which(notAllNAcol1), which(notAllNAcol2))
 		for (i in 1:ncol(data1Num)) { # KS test 
 			if (i %in% validCols) {
-				tst <- ks.test(data1Num[,i], data2Num[,i])
+				tst <- ks.test(data1Num[[i]], data2Num[[i]])
 				ks[i] <- tst$p.value
 			}
 			else ks[i] <-NA

@@ -231,7 +231,196 @@ predict.TreeEnsemble <- function(object, data, type=c("both","class","probabilit
 
 # newdata <- function(object, ...) UseMethod("newdata", object)
 
-newdata.TreeEnsemble <- function(object, size=1, onlyPath=FALSE, classProb=NULL, predictClass=FALSE, ...) {
+#newdataOld.TreeEnsemble <- function(object, size=1, onlyPath=FALSE, classProb=NULL, predictClass=FALSE, ...) {
+#	if (object$densityData == "no")
+#		stop("newdata needs proper information stored in the model to generate data")
+#	if (! is(object, "TreeEnsemble"))
+#		stop("newdata cannot generate data for objects of class ",class(object))
+#	
+#	if (object$problemType == "classification" && predictClass == TRUE) # try to assure correct class distribution
+#		noInst <- 2 * size
+#	else noInst <- size
+#	
+#	dat <- matrix(NA, nrow = noInst, ncol = object$noAttr )
+#	
+#	if (object$problemType == "classification") {
+#		if (is.null(classProb)) { # use class probability from the generator
+#			classProb <- object$classProb
+#			classProb <- classProb / sum(classProb) # normalize sum to 1
+#		}
+#		nFromClass <- round(noInst * classProb)
+#		
+#		while (sum(nFromClass) < noInst) { # correct possible rounding error
+#			rndIdx <- 1 + floor(runif(n=1, min=0, max=length(nFromClass)))
+#			nFromClass[rndIdx] <- nFromClass[rndIdx] + 1
+#		}
+#		while (sum(nFromClass) > noInst) { # correct possible rounding error
+#			rndIdx <- 1 + floor(runif(n=1, min=0, max=length(nFromClass)))
+#			if (nFromClass[rndIdx] > 0)
+#			   nFromClass[rndIdx] <- nFromClass[rndIdx] - 1
+#		}
+#		
+#		classIdx <- object$noAttr # match(object$predictorName, object$originalNames)
+#	}
+#	else {
+#		nFromClass <- c(noInst)
+#		classIdx <- 0
+#		selectedClass <- 1
+#	}
+#	nToGen <- noInst
+#	
+#	if (object$densityData == "leaf") {
+#		i <- 1
+#		while (any(nFromClass > 0)) { # force generation according to the given class distribution
+#			treeOrder <- sample(1:object$noTrees, size=object$noTrees, replace=F)
+#			treeIdx <- 1
+#			if (object$problemType == "classification") 
+#				selectedClass <- sample(1:object$noClasses, size=1, prob = nFromClass / nToGen )		
+#			while (any(is.na(dat[i,]))) {
+#				t <- treeOrder[treeIdx]
+#				if ((object$problemType == "classification" && any(object$dataGenerator[[t]]$classWeights[[selectedClass]]>0)) ||
+#						(object$problemType != "classification") ) { # is any leaf with instances of chosen class present
+#					if (treeIdx == 1) { # the first leaf is selected based on required class distribution
+#						if (object$problemType == "classification") {
+#							leafIdx <- sample(1:length(object$dataGenerator[[t]]$leaves), size = 1, prob = object$dataGenerator[[t]]$classWeights[[selectedClass]], replace=T)
+#						}
+#						else {  # for regression or density problems select based on leaf weight distribution
+#							leafIdx <- sample(1:length(object$dataGenerator[[t]]$leaves), size = 1, prob = object$dataGenerator[[t]]$weights, replace=T)
+#						}		
+#					}
+#					else {  # find the leaf based on already assigned values 
+#						leafIdx <- findLeafIdx(object$trees[[t]]$tree, dat[i,])
+#					}
+#					
+#					# generate missing 
+#					for (a in 1:object$noAttr) {
+#						if (!is.na(dat[i,a])){
+#							next 
+#						}
+#						else if (a == classIdx){
+#							dat[i,classIdx] <- selectedClass 
+#						}
+#						else if (onlyPath && !object$dataGenerator[[t]]$leaves[[leafIdx]]$onPath[a]){
+#							next 
+#						}
+#						else if (! any(class(object$dataGenerator[[t]]$leaves[[leafIdx]]$cdfs[[a]]) %in% c("ecdf","logspline","kde"))) {
+#							dat[i,a] <- NA
+#						}
+#						else if ("factor" %in% object$attrClasses[[a]]) {
+#							dat[i, a] <- quantile(object$dataGenerator[[t]]$leaves[[leafIdx]]$cdfs[[a]], probs=runif(1, 0, 1), type=3)						
+#						}
+#						else if ( "ecdf" %in% class(object$dataGenerator[[t]]$leaves[[leafIdx]]$cdfs[[a]]) ) {
+#							dat[i, a] <- quantile(object$dataGenerator[[t]]$leaves[[leafIdx]]$cdfs[[a]], probs=runif(1, 0, 1), type=8, ...)
+#						}
+#						else if ( "logspline" %in% class(object$dataGenerator[[t]]$leaves[[leafIdx]]$cdfs[[a]]) ){
+#							dat[i,a] <- rlogspline(1, object$dataGenerator[[t]]$leaves[[leafIdx]]$cdfs[[a]]) 
+#						}
+#						else if ( "kde" %in% class(object$dataGenerator[[t]]$leaves[[leafIdx]]$cdfs[[a]]) ) {
+#							dat[i, a] <- rkde(1, object$dataGenerator[[t]]$leaves[[leafIdx]]$cdfs[[a]])
+#						}
+#						else stop("Invalid type of generator detected in the leaf ",class(object$dataGenerator[[t]]$leaves[[leafIdx]]$cdfs[[a]]))			  
+#					}
+#				}		
+#				treeIdx <- treeIdx + 1
+#				if (treeIdx > object$noTrees && any(is.na(dat[i,]))) { # default generator
+#					for (j in 1:ncol(dat)) {
+#						if (is.na(dat[i,j])) {
+#							if ("factor" %in% object$attrClasses[[j]]) {
+#								dat[i,j] <- useDefaultGenerator(object$defaultGenerator[[j]], TRUE)
+#							}
+#							else {
+#								dat[i,j] <- useDefaultGenerator(object$defaultGenerator[[j]], FALSE)						      
+#							}
+#						}
+#					}
+#				}	  
+#			}
+#			i <- i+1
+#			nToGen <- nToGen - 1
+#			nFromClass[selectedClass] <- nFromClass[selectedClass]-1
+#		}		
+#	}
+#	else { # generators other then in the leaf
+#		for (i in 1:noInst) {
+#			treeOrder <- sample(1:object$noTrees, object$noTrees)
+#			t <- 1
+#			# while not all the values are filled in
+#			while (any(is.na(dat[i,])) && t <= object$noTrees) {
+#				if (object$densityData == "topDown") {
+#					gen <- fillDataWithTreeTopDown(object$trees[[treeOrder[t]]]$tree, dat[i,])
+#				}
+#				else if (object$densityData == "bottomUp") {
+#					gen <- fillDataWithTreeBottomUp(object$trees[[treeOrder[t]]]$tree, dat[i,])     
+#				}
+#				else stop("newdata encountered unrecognized densityData type in the model ", object$densityData)
+#				dat[i,] <- gen 
+#				t <- t + 1
+#			}
+#			if (any(is.na(dat[i,]))) {
+#				for (j in 1:ncol(dat))
+#					if (is.na(dat[i,j])){
+#						if ("factor" %in% object$attrClasses[[j]]) 
+#							dat[i,j] <- useDefaultGenerator(object$defaultGenerator[[j]], TRUE)
+#						else
+#							dat[i,j] <- useDefaultGenerator(object$defaultGenerator[[j]], FALSE)
+#					}
+#			}	  
+#		}
+#	}
+#	dat[dat == -.Machine$double.xmax] <- NA  # fix values set by NAgenerator 
+#	newdat <- as.data.frame(dat)
+#	
+#	names(newdat) <- object$attrNames
+#	for (i in 1:object$noAttr){
+#		if ("factor" %in% object$attrClasses[[i]]) {
+#			newdat[[i]] <- factor(newdat[[i]],levels=seq_along(object$attrLevels[[i]]), labels=object$attrLevels[[i]])
+#			if (object$attrOrdered[i])
+#				newdat[[i]] <- as.ordered(newdat[[i]])
+#		}
+#		else if ("integer" %in% object$attrClasses[[i]])
+#			newdat[[i]] <- as.integer(round(newdat[[i]]))
+#	}
+#	
+#	# set class values according to prediction
+#	if (object$problemType == "classification" && predictClass == TRUE) {
+#		pred <- predict(object, newdat, type = "class")
+#		
+#		nFromClass <- round(size * classProb)
+#		while (sum(nFromClass) < size) { # correct possible rounding error
+#			rndIdx <- 1 + floor(runif(n=1, min=0, max=length(nFromClass)))
+#			nFromClass[rndIdx] <- nFromClass[rndIdx] + 1
+#		}
+#		while (sum(nFromClass) > size) { # correct possible rounding error
+#			rndIdx <- 1 + floor(runif(n=1, min=0, max=length(nFromClass)))
+#			nFromClass[rndIdx] <- nFromClass[rndIdx] - 1
+#		}
+#		returnData <- newdat[NULL,]
+#		for (cl in 1:length(nFromClass)) {
+#			if (nFromClass[cl] == 0)
+#				next ;
+#			clData <- newdat[as.integer(pred) == cl,]
+#			if (nFromClass[cl] <= nrow(clData)) { # take all with predicted class cl
+#				prepData <- clData[1:nFromClass[cl],]
+#			}
+#			else { # take all with predicted class cl and the missing ones with sampled class cl 
+#				prepData <- rbind(clData, newdat[as.integer(newdat[,classIdx])==cl,][1:(nFromClass[cl]-nrow(clData)),])
+#			}
+#			# assign the class cl to all of them
+#			prepData[[classIdx]] <- factor(cl,levels=1:length(object$attrLevels[[classIdx]]), labels=object$attrLevels[[classIdx]]) 
+#			returnData <- rbind(returnData, prepData)
+#		}
+#		returnData <- returnData[sample(1:size,size=size,replace=FALSE),] # shuffle instances
+#		returnData <- returnData[,object$originalNames] # reorder attributes
+#		return(returnData)
+#	}
+#	else {
+#		newdat <- newdat[,object$originalNames] # reorder attributes
+#		return(newdat)
+#	}			
+#	
+#}
+
+newdata.TreeEnsemble <- function(object, fillData=NULL, size=ifelse(is.null(fillData),1,nrow(fillData)), onlyPath=FALSE, classProb=NULL, predictClass=FALSE, ...) {
 	if (object$densityData == "no")
 		stop("newdata needs proper information stored in the model to generate data")
 	if (! is(object, "TreeEnsemble"))
@@ -241,7 +430,6 @@ newdata.TreeEnsemble <- function(object, size=1, onlyPath=FALSE, classProb=NULL,
 		noInst <- 2 * size
 	else noInst <- size
 	
-	dat <- matrix(NA, nrow = noInst, ncol = object$noAttr )
 	
 	if (object$problemType == "classification") {
 		if (is.null(classProb)) { # use class probability from the generator
@@ -257,7 +445,7 @@ newdata.TreeEnsemble <- function(object, size=1, onlyPath=FALSE, classProb=NULL,
 		while (sum(nFromClass) > noInst) { # correct possible rounding error
 			rndIdx <- 1 + floor(runif(n=1, min=0, max=length(nFromClass)))
 			if (nFromClass[rndIdx] > 0)
-			   nFromClass[rndIdx] <- nFromClass[rndIdx] - 1
+				nFromClass[rndIdx] <- nFromClass[rndIdx] - 1
 		}
 		
 		classIdx <- object$noAttr # match(object$predictorName, object$originalNames)
@@ -268,6 +456,19 @@ newdata.TreeEnsemble <- function(object, size=1, onlyPath=FALSE, classProb=NULL,
 		selectedClass <- 1
 	}
 	nToGen <- noInst
+	
+	if (is.null(fillData)) { # no prespecified value, generate everything from scratch
+		dat <- matrix(NA, nrow = noInst, ncol = object$noAttr)
+	}
+	else {
+		dat <- fillData 
+		if (classIdx > 0) {
+			for (col in 1:ncol(dat)) {
+				if (is.factor(dat[[col]]))
+		           dat[[col]] <- as.integer(dat[[col]])
+		   }
+	   }
+	}
 	
 	if (object$densityData == "leaf") {
 		i <- 1
@@ -419,6 +620,7 @@ newdata.TreeEnsemble <- function(object, size=1, onlyPath=FALSE, classProb=NULL,
 	}			
 	
 }
+
 
 treeDataGenerator<-function(ensemble, dat, ...) {
 	

@@ -167,7 +167,7 @@ newdata.RBFgenerator <- function(object, size, var=c("estimated","Silverman"), c
   
   nh <- intFromProb(unitProbs, n) # number of instances from each Gaussian unit
   
-  Rprof(memory.profiling=TRUE)
+  #Rprof(memory.profiling=TRUE)
   genValues <- matrix(0,nrow=0,ncol=object$noAttrGen)
   genClass <- c()
   sigma <- diag(nrow=object$noAttrGen)
@@ -245,7 +245,7 @@ newdata.RBFgenerator <- function(object, size, var=c("estimated","Silverman"), c
   }
   names(genData) <- object$datNames
   genData <- genData[sample(1:nrow(genData),nrow(genData)),]  # shuffle
-  Rprof(NULL)
+  #Rprof(NULL)
   genData[,object$originalNames]
 }  
   

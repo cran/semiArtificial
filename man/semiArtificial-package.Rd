@@ -22,7 +22,7 @@ Data evaluation support tools include:
 \item evaluation based on clustering using Adjusted Rand Index (ARI) and Fowlkes-Mallows index (FM),
 \item evaluation based on prediction with a model, e.g., random forests.
 }
-Further software and development versions are available at \url{http://lkm.fri.uni-lj.si/rmarko/software}. 
+Further software and development versions are available at \url{http://lkm.fri.uni-lj.si/rmarko/software/}. 
 }
 \author{
 Marko Robnik-Sikonja 

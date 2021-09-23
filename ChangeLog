@@ -1,3 +1,5 @@
+semiArtificial-2.4.1, 2021-09-23: bug fix in dataSimilarity, due to different way how data.frames are reduced to vectors in R 
+semiArtificial-2.4.0, 2020-09-09: added possibility to prespecify some data in treeEnsemble generator
 semiArtificial-2.3.1, 2019-05-31: bux fix for instances with NA in response
 semiArtificial-2.3.0, 2019-05-29: bux fix for empty and NA attributes
 semiArtificial-2.2.6, 2017-05-03: bug fixes, new defaults in classifier for cleanData with reassignResponse

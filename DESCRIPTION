@@ -1,7 +1,7 @@
 Package: semiArtificial
 Title: Generator of Semi-Artificial Data
-Version: 2.3.1
-Date: 2019-05-31
+Version: 2.4.1
+Date: 2021-09-23
 Author: Marko Robnik-Sikonja
 Maintainer: Marko Robnik-Sikonja <marko.robnik@fri.uni-lj.si>
 Description: Contains methods to generate and evaluate semi-artificial data sets. 
@@ -20,6 +20,6 @@ URL: http://lkm.fri.uni-lj.si/rmarko/software/
 Imports: CORElearn (>=
         1.50.3),RSNNS,MASS,nnet,cluster,fpc,stats,timeDate,robustbase,ks,logspline,methods,mcclust,flexclust,StatMatch
 NeedsCompilation: no
-Packaged: 2019-05-31 20:26:50 UTC; rmarko
+Packaged: 2021-09-23 19:34:31 UTC; marko
 Repository: CRAN
-Date/Publication: 2019-05-31 21:30:03 UTC
+Date/Publication: 2021-09-23 20:10:02 UTC
